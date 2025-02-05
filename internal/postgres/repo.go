@@ -15,7 +15,6 @@ type Repository interface {
 	GetTransactions(ctx context.Context, userID int64) ([]Transaction, error)
 }
 
-// Transaction представляет запись транзакции в базе
 type Transaction struct {
 	ID              int64     `json:"id"`
 	UserID          *int64    `json:"user_id,omitempty"`
@@ -26,17 +25,15 @@ type Transaction struct {
 	CreatedAt       time.Time `json:"created_at"`
 }
 
-// Repository инкапсулирует доступ к базе данных через pgxpool
 type RepositoryImpl struct {
 	pool *pgxpool.Pool
 }
 
-// NewRepository создаёт новый экземпляр Repository с использованием pgxpool
 func NewRepository(pool *pgxpool.Pool) *RepositoryImpl {
 	return &RepositoryImpl{pool: pool}
 }
 
-// Deposit пополняет баланс пользователя и создаёт транзакцию типа "deposit"
+// Пополняет баланс пользователя и создаёт транзакцию типа "deposit"
 func (r *RepositoryImpl) Deposit(ctx context.Context, userID int64, amount float64) (err error) {
 	tx, err := r.pool.Begin(ctx)
 	if err != nil {
@@ -74,7 +71,7 @@ func (r *RepositoryImpl) Deposit(ctx context.Context, userID int64, amount float
 	return nil
 }
 
-// Transfer переводит деньги от одного пользователя к другому, используя транзакцию
+// Переводит деньги от одного пользователя к другому
 func (r *RepositoryImpl) Transfer(ctx context.Context, senderID, receiverID int64, amount float64) (err error) {
 	tx, err := r.pool.Begin(ctx)
 	if err != nil {
@@ -130,7 +127,7 @@ func (r *RepositoryImpl) Transfer(ctx context.Context, senderID, receiverID int6
 	return nil
 }
 
-// GetTransactions получает 10 последних транзакций для указанного пользователя
+// Получает 10 последних транзакций для указанного пользователя
 func (r *RepositoryImpl) GetTransactions(ctx context.Context, userID int64) ([]Transaction, error) {
 	query := `
 		SELECT id, user_id, sender_id, receiver_id, amount, transaction_type, created_at

@@ -10,7 +10,6 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-// MockRepository реализует интерфейс Repository
 type MockRepository struct {
 	mock.Mock
 }
@@ -37,12 +36,11 @@ func TestDeposit(t *testing.T) {
 	userID := int64(1)
 	amount := 100.0
 
-	// Настройка ожидания: Deposit с такими параметрами должен вернуть nil
+	// Ожидаем, что метод Deposit будет вызван с заданными параметрами и не вернет ошибок
 	mockRepo.On("Deposit", mock.Anything, userID, amount).Return(nil)
 
 	err := service.Deposit(context.Background(), userID, amount)
 
-	// Проверяем, что ошибок нет и ожидания выполнены
 	assert.NoError(t, err)
 	mockRepo.AssertExpectations(t)
 }
@@ -51,15 +49,16 @@ func TestDeposit_Error(t *testing.T) {
 	mockRepo := new(MockRepository)
 	service := NewService(mockRepo)
 
+	// Входные данные
 	userID := int64(1)
 	amount := 100.0
 
-	// Настройка ожидания: Deposit с такими параметрами должен вернуть ошибку
+	// Ожидаем, что метод Deposit вызовет ошибку
 	mockRepo.On("Deposit", mock.Anything, userID, amount).Return(errors.New("db error"))
 
 	err := service.Deposit(context.Background(), userID, amount)
 
-	// Проверяем, что ошибка возвращена корректно
+	// Проверяем, что ошибка возвращена и она соответствует ожидаемой
 	assert.Error(t, err)
 	assert.Equal(t, "db error", err.Error())
 	mockRepo.AssertExpectations(t)
@@ -69,16 +68,16 @@ func TestTransfer(t *testing.T) {
 	mockRepo := new(MockRepository)
 	service := NewService(mockRepo)
 
+	// Входные данные
 	senderID := int64(1)
 	receiverID := int64(2)
 	amount := 50.0
 
-	// Настройка ожидания: Transfer с такими параметрами должен вернуть nil
+	// Ожидаем, что метод Transfer будет вызван с заданными параметрами и не вернет ошибок
 	mockRepo.On("Transfer", mock.Anything, senderID, receiverID, amount).Return(nil)
 
 	err := service.Transfer(context.Background(), senderID, receiverID, amount)
 
-	// Проверяем, что ошибок нет и ожидания выполнены
 	assert.NoError(t, err)
 	mockRepo.AssertExpectations(t)
 }
@@ -87,16 +86,17 @@ func TestTransfer_Error(t *testing.T) {
 	mockRepo := new(MockRepository)
 	service := NewService(mockRepo)
 
+	// Входные данные
 	senderID := int64(1)
 	receiverID := int64(2)
 	amount := 50.0
 
-	// Настройка ожидания: Transfer с такими параметрами должен вернуть ошибку
+	// Ожидаем, что метод Transfer вызовет ошибку
 	mockRepo.On("Transfer", mock.Anything, senderID, receiverID, amount).Return(errors.New("transfer failed"))
 
 	err := service.Transfer(context.Background(), senderID, receiverID, amount)
 
-	// Проверяем, что ошибка возвращена корректно
+	// Проверяем, что ошибка возвращена и она соответствует ожидаемой
 	assert.Error(t, err)
 	assert.Equal(t, "transfer failed", err.Error())
 	mockRepo.AssertExpectations(t)
@@ -106,18 +106,19 @@ func TestGetTransactions(t *testing.T) {
 	mockRepo := new(MockRepository)
 	service := NewService(mockRepo)
 
+	// Входные данные
 	userID := int64(1)
 	expectedTransactions := []postgres.Transaction{
 		{ID: 1, UserID: &userID, Amount: 100.0, TransactionType: "deposit"},
 		{ID: 2, SenderID: &userID, ReceiverID: new(int64), Amount: 50.0, TransactionType: "transfer"},
 	}
 
-	// Настройка ожидания: GetTransactions с таким userID должен вернуть список транзакций
+	// Ожидаем, что метод GetTransactions вернет список транзакций без ошибок
 	mockRepo.On("GetTransactions", mock.Anything, userID).Return(expectedTransactions, nil)
 
 	transactions, err := service.GetTransactions(context.Background(), userID)
 
-	// Проверяем, что ошибок нет и данные возвращены корректно
+	// Проверяем, что ошибок нет и транзакции совпадают с ожидаемыми
 	assert.NoError(t, err)
 	assert.Len(t, transactions, 2)
 	assert.Equal(t, expectedTransactions, transactions)
@@ -130,6 +131,7 @@ func TestGetTransactions_Error(t *testing.T) {
 
 	userID := int64(1)
 
+	// Ожидаем, что метод GetTransactions вызовет ошибку
 	mockRepo.On("GetTransactions", mock.Anything, userID).Return([]postgres.Transaction{}, errors.New("db error"))
 
 	transactions, err := service.GetTransactions(context.Background(), userID)
