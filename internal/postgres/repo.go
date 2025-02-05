@@ -9,6 +9,12 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+type Repository interface {
+	Deposit(ctx context.Context, userID int64, amount float64) error
+	Transfer(ctx context.Context, senderID, receiverID int64, amount float64) error
+	GetTransactions(ctx context.Context, userID int64) ([]Transaction, error)
+}
+
 // Transaction представляет запись транзакции в базе
 type Transaction struct {
 	ID              int64     `json:"id"`
@@ -21,17 +27,17 @@ type Transaction struct {
 }
 
 // Repository инкапсулирует доступ к базе данных через pgxpool
-type Repository struct {
+type RepositoryImpl struct {
 	pool *pgxpool.Pool
 }
 
 // NewRepository создаёт новый экземпляр Repository с использованием pgxpool
-func NewRepository(pool *pgxpool.Pool) *Repository {
-	return &Repository{pool: pool}
+func NewRepository(pool *pgxpool.Pool) *RepositoryImpl {
+	return &RepositoryImpl{pool: pool}
 }
 
 // Deposit пополняет баланс пользователя и создаёт транзакцию типа "deposit"
-func (r *Repository) Deposit(ctx context.Context, userID int64, amount float64) (err error) {
+func (r *RepositoryImpl) Deposit(ctx context.Context, userID int64, amount float64) (err error) {
 	tx, err := r.pool.Begin(ctx)
 	if err != nil {
 		return err
@@ -69,7 +75,7 @@ func (r *Repository) Deposit(ctx context.Context, userID int64, amount float64) 
 }
 
 // Transfer переводит деньги от одного пользователя к другому, используя транзакцию
-func (r *Repository) Transfer(ctx context.Context, senderID, receiverID int64, amount float64) (err error) {
+func (r *RepositoryImpl) Transfer(ctx context.Context, senderID, receiverID int64, amount float64) (err error) {
 	tx, err := r.pool.Begin(ctx)
 	if err != nil {
 		return err
@@ -125,7 +131,7 @@ func (r *Repository) Transfer(ctx context.Context, senderID, receiverID int64, a
 }
 
 // GetTransactions получает 10 последних транзакций для указанного пользователя
-func (r *Repository) GetTransactions(ctx context.Context, userID int64) ([]Transaction, error) {
+func (r *RepositoryImpl) GetTransactions(ctx context.Context, userID int64) ([]Transaction, error) {
 	query := `
 		SELECT id, user_id, sender_id, receiver_id, amount, transaction_type, created_at
 		FROM transactions

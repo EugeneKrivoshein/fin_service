@@ -14,7 +14,6 @@ type Config struct {
 	DBPass        string
 	DBName        string
 	ServerAddress string
-	MigrationPath string
 }
 
 func LoadConfig(envPath string) (*Config, error) {
@@ -29,6 +28,5 @@ func LoadConfig(envPath string) (*Config, error) {
 		DBHost:        os.Getenv("DB_HOST"),
 		DBPort:        os.Getenv("DB_PORT"),
 		ServerAddress: os.Getenv("SERVER_ADDRESS"),
-		MigrationPath: os.Getenv("MIGRATIONS_PATH"),
 	}, nil
 }

@@ -1,5 +1,5 @@
 DCOMPOSE = docker-compose
-MIGRATE_CMD = docker exec app_container go run ./internal/postgres/migrations/migrate.go
+MIGRATE_CMD = docker exec app_container sh -c "cd /app/internal/postgres/migrations && go run migrate.go"
 
 .PHONY: run up migrate stop clean
 

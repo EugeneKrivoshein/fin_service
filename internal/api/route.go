@@ -5,7 +5,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// SetupRouter настраивает маршруты и возвращает *gin.Engine
 func SetupRouter(h *handler.Handler) *gin.Engine {
 	r := gin.Default()
 

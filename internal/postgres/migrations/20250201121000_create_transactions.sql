@@ -1,3 +1,4 @@
+-- +goose Up
 CREATE TABLE transactions (
     id SERIAL PRIMARY KEY,
     user_id INT REFERENCES users(id) ON DELETE CASCADE,  
@@ -12,4 +13,5 @@ CREATE INDEX idx_user_id ON transactions(user_id);
 CREATE INDEX idx_sender_id ON transactions(sender_id);
 CREATE INDEX idx_receiver_id ON transactions(receiver_id);
 
+-- +goose Down
 DROP TABLE IF EXISTS transactions CASCADE;

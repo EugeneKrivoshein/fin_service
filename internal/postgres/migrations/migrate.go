@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	cfg, err := config.LoadConfig("config.env")
+	cfg, err := config.LoadConfig("/app/config.env")
 	if err != nil {
 		log.Fatalf("ошибка загрузки конфигурации: %v", err)
 	}
@@ -27,7 +27,7 @@ func main() {
 	}
 	defer db.Close()
 
-	if err := goose.Up(db, "migrations"); err != nil {
+	if err := goose.Up(db, "/app/internal/postgres/migrations"); err != nil {
 		log.Fatal("Migration failed:", err)
 	}
 

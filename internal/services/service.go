@@ -6,13 +6,11 @@ import (
 	repo "github.com/EugeneKrivoshein/fin_service/internal/postgres"
 )
 
-// Service содержит бизнес-логику
 type Service struct {
-	repo *repo.Repository
+	repo repo.Repository
 }
 
-// NewService создаёт новый экземпляр Service
-func NewService(r *repo.Repository) *Service {
+func NewService(r repo.Repository) *Service {
 	return &Service{
 		repo: r,
 	}
