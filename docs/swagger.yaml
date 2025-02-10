@@ -1,0 +1,152 @@
+definitions:
+  handlers.DepositRequest:
+    properties:
+      amount:
+        type: number
+      user_id:
+        type: integer
+    required:
+    - amount
+    - user_id
+    type: object
+  handlers.TransferRequest:
+    properties:
+      amount:
+        type: number
+      receiver_id:
+        type: integer
+      sender_id:
+        type: integer
+    required:
+    - amount
+    - receiver_id
+    - sender_id
+    type: object
+  postgres.Transaction:
+    properties:
+      amount:
+        type: number
+      created_at:
+        type: string
+      id:
+        type: integer
+      receiver_id:
+        type: integer
+      sender_id:
+        type: integer
+      transaction_type:
+        type: string
+      user_id:
+        type: integer
+    type: object
+info:
+  contact: {}
+paths:
+  /deposit:
+    post:
+      consumes:
+      - application/json
+      description: Позволяет пользователю пополнить свой баланс
+      parameters:
+      - description: Данные для пополнения
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.DepositRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Баланс успешно пополнен
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Ошибка валидации
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Пополнение баланса
+      tags:
+      - Баланс
+  /transactions:
+    get:
+      consumes:
+      - application/json
+      description: Возвращает список последних 10 транзакций пользователя
+      parameters:
+      - description: ID пользователя
+        in: query
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список транзакций
+          schema:
+            items:
+              $ref: '#/definitions/postgres.Transaction'
+            type: array
+        "400":
+          description: Ошибка валидации
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Получение последних 10 транзакций
+      tags:
+      - Транзакции
+  /transfer:
+    post:
+      consumes:
+      - application/json
+      description: Позволяет пользователю перевести деньги другому пользователю
+      parameters:
+      - description: Данные для перевода
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.TransferRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Перевод успешно выполнен
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Ошибка валидации
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Перевод денег
+      tags:
+      - Транзакции
+swagger: "2.0"

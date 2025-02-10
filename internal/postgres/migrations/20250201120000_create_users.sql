@@ -6,5 +6,10 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+INSERT INTO users (username, balance) VALUES
+    ('user1', 1000.00),
+    ('user2', 1500.50),
+    ('user3', 2000.75);
+
 -- +goose Down
 DROP TABLE IF EXISTS users CASCADE;

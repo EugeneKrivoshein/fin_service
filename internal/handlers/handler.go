@@ -4,9 +4,12 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/EugeneKrivoshein/fin_service/internal/postgres"
 	service "github.com/EugeneKrivoshein/fin_service/internal/services"
 	"github.com/gin-gonic/gin"
 )
+
+var _ postgres.Transaction
 
 type Handler struct {
 	service *service.Service
@@ -29,7 +32,17 @@ type TransferRequest struct {
 	Amount     float64 `json:"amount" binding:"required,gt=0"`
 }
 
-// Обработка запроса на пополнение баланса
+// HandleDeposit godoc
+// @Summary Пополнение баланса
+// @Description Позволяет пользователю пополнить свой баланс
+// @Tags Баланс
+// @Accept json
+// @Produce json
+// @Param input body DepositRequest true "Данные для пополнения"
+// @Success 200 {object} map[string]string "Баланс успешно пополнен"
+// @Failure 400 {object} map[string]string "Ошибка валидации"
+// @Failure 500 {object} map[string]string "Внутренняя ошибка сервера"
+// @Router /deposit [post]
 func (h *Handler) HandleDeposit(c *gin.Context) {
 	var req DepositRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -46,7 +59,17 @@ func (h *Handler) HandleDeposit(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Баланс успешно пополнен"})
 }
 
-// Обрабатка запроса на перевод денег
+// HandleTransfer godoc
+// @Summary Перевод денег
+// @Description Позволяет пользователю перевести деньги другому пользователю
+// @Tags Транзакции
+// @Accept json
+// @Produce json
+// @Param input body TransferRequest true "Данные для перевода"
+// @Success 200 {object} map[string]string "Перевод успешно выполнен"
+// @Failure 400 {object} map[string]string "Ошибка валидации"
+// @Failure 500 {object} map[string]string "Внутренняя ошибка сервера"
+// @Router /transfer [post]
 func (h *Handler) HandleTransfer(c *gin.Context) {
 	var req TransferRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -63,7 +86,17 @@ func (h *Handler) HandleTransfer(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Перевод успешно выполнен"})
 }
 
-// Обрабатка запроса на получение последних транзакций
+// HandleGetTransactions godoc
+// @Summary Получение последних 10 транзакций
+// @Description Возвращает список последних 10 транзакций пользователя
+// @Tags Транзакции
+// @Accept json
+// @Produce json
+// @Param user_id query int true "ID пользователя"
+// @Success 200 {array} postgres.Transaction "Список транзакций"
+// @Failure 400 {object} map[string]string "Ошибка валидации"
+// @Failure 500 {object} map[string]string "Внутренняя ошибка сервера"
+// @Router /transactions [get]
 func (h *Handler) HandleGetTransactions(c *gin.Context) {
 	// Можно передавать user_id как параметр запроса
 	userIDParam := c.Query("user_id")

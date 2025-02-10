@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	_ "github.com/EugeneKrivoshein/fin_service/docs"
 	route "github.com/EugeneKrivoshein/fin_service/internal/api"
 	handler "github.com/EugeneKrivoshein/fin_service/internal/handlers"
 	"github.com/EugeneKrivoshein/fin_service/internal/postgres"
