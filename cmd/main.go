@@ -12,6 +12,11 @@ import (
 	service "github.com/EugeneKrivoshein/fin_service/internal/services"
 )
 
+// @title Финансовый сервис API
+// @version 1.0
+// @description API для управления балансом и переводами денег
+// @host localhost:8080
+// @BasePath /
 func main() {
 	pgxProvider, err := postgres.NewPGXProvider()
 	if err != nil {
